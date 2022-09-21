@@ -11,9 +11,9 @@ public class HelloWorldController {
     public String hello(){
         return "Hello World";
     }
-    @GetMapping("/ijola")
+    @GetMapping("/bye")
     public String Welcome(){
-        return "Hello World Again";
+        return "Its a new line";
     }
 }
 
