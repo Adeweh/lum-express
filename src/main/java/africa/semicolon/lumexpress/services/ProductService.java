@@ -1,6 +1,7 @@
 package africa.semicolon.lumexpress.services;
 
 import africa.semicolon.lumexpress.data.dtos.requests.AddProductRequest;
+import africa.semicolon.lumexpress.data.dtos.requests.GetAllItemsRequest;
 import africa.semicolon.lumexpress.data.dtos.requests.UpdateProductRequest;
 import africa.semicolon.lumexpress.data.dtos.responses.AddProductResponse;
 import africa.semicolon.lumexpress.data.models.Product;
@@ -15,7 +16,7 @@ public interface ProductService {
     AddProductResponse addProduct(AddProductRequest request) throws IOException;
     String updateProductDetails(UpdateProductRequest request);
     Product  getProductById(Long Id);
-    Page<Product> getAllProducts();
+    Page<Product> getAllProducts(GetAllItemsRequest getAllItemsRequest);
     String deleteProduct(Long Id);
 
 

@@ -1,6 +1,7 @@
 package africa.semicolon.lumexpress.services;
 
 import africa.semicolon.lumexpress.data.dtos.requests.AddProductRequest;
+import africa.semicolon.lumexpress.data.dtos.requests.GetAllItemsRequest;
 import africa.semicolon.lumexpress.data.dtos.requests.UpdateProductRequest;
 import africa.semicolon.lumexpress.data.dtos.responses.AddProductResponse;
 import africa.semicolon.lumexpress.data.models.Category;
@@ -18,8 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -60,12 +59,12 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Page<Product> getAllProducts() {
+    public Page<Product> getAllProducts(GetAllItemsRequest getAllItemsRequest) {
 
-        Pageable pageSpecs = PageRequest.of(0, 5);
-        productRepository.findAll(pageSpecs);
+        Pageable pageSpecs = PageRequest.of(getAllItemsRequest.getPageNumber(), getAllItemsRequest.getNumberOfItemsPerPage() -1);
+        Page<Product> products = productRepository.findAll(pageSpecs);
 
-        return null;
+        return products;
     }
 
     @Override

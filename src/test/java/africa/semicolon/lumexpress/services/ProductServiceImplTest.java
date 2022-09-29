@@ -1,8 +1,10 @@
 package africa.semicolon.lumexpress.services;
 
 import africa.semicolon.lumexpress.data.dtos.requests.AddProductRequest;
+import africa.semicolon.lumexpress.data.dtos.requests.GetAllItemsRequest;
 import africa.semicolon.lumexpress.data.dtos.responses.AddProductResponse;
 import africa.semicolon.lumexpress.data.models.Product;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import java.nio.file.Paths;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@Slf4j
 @SpringBootTest
 class ProductServiceImplTest {
 
@@ -31,7 +34,7 @@ class ProductServiceImplTest {
         Path path = Paths.get("/home/adeh/Downloads/peak.jpeg");
         MultipartFile file = new MockMultipartFile("peak", Files.readAllBytes(path));
         request= AddProductRequest.builder().name("Milk").productCategory("Beverages").price(BigDecimal.valueOf(30.00)).quantity(10).
-//                image(file).
+               image(file).
                 build();
     }
 
@@ -57,9 +60,17 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void getAllProductsTest() {
-        Page<Product> productPage = productService.getAllProducts();
+    void getAllProductsTest() throws IOException {
+        productService.addProduct(request);
+        var getItemsRequest = buildGetItemsRequest();
+
+        Page<Product> productPage = productService.getAllProducts(getItemsRequest);
+        log.info("page contents:: {}", productPage);
         assertThat(productPage).isNotNull();
         assertThat(productPage.getTotalElements()).isGreaterThan(0);
+    }
+
+    private GetAllItemsRequest buildGetItemsRequest(){
+        return GetAllItemsRequest.builder().numberOfItemsPerPage(8).pageNumber(1).build();
     }
 }
