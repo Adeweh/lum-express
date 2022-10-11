@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @Builder
 
-public class Admin {
+public class Admin extends LumExpressUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

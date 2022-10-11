@@ -21,7 +21,7 @@ class CustomerServiceImplTest {
 
     @BeforeEach
     void setUp() {
-         request = CustomerRegistrationRequest.builder().email("hi@gmail.com").password("Pa55Word").country("Nigeria").build();
+         request = CustomerRegistrationRequest.builder().email("adewehabang@gmail.com").password("Pa55Word").country("Nigeria").build();
     }
 
     @AfterEach
