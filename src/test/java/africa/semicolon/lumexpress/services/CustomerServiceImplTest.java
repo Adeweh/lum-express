@@ -1,7 +1,9 @@
 package africa.semicolon.lumexpress.services;
 
 import africa.semicolon.lumexpress.data.dtos.requests.CustomerRegistrationRequest;
+import africa.semicolon.lumexpress.data.dtos.requests.UpdateCustomerDetails;
 import africa.semicolon.lumexpress.data.dtos.responses.CustomerRegistrationResponse;
+import africa.semicolon.lumexpress.utils.LumExpressUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 
 class CustomerServiceImplTest {
@@ -29,7 +31,7 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void register() {
+    void registerTest() {
          CustomerRegistrationResponse customerRegistrationResponse = customerService.register(request);
 
          assertThat(customerRegistrationResponse).isNotNull();
@@ -43,6 +45,14 @@ class CustomerServiceImplTest {
     }
 
     @Test
-    void completeProfile() {
+    void updateProfileTest() {
+        CustomerRegistrationResponse customerRegistrationResponse = customerService.register(request);
+        UpdateCustomerDetails details = UpdateCustomerDetails.builder().customerId(customerRegistrationResponse.getUserId())
+                .imageUrl(LumExpressUtils.getMockCloudinaryImageUrl())
+                .lastName("Ade").city("Lagos").street("Hebert Macauley").state("Lagos").phoneNumber("2209").build();
+
+        var updateResponse = customerService.updateProfile(details);
+        assertThat(updateResponse).isNotNull();
+        assertThat(updateResponse.contains("success")).isTrue();
     }
 }

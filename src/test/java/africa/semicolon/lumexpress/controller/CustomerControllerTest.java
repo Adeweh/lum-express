@@ -27,7 +27,7 @@ class CustomerControllerTest {
 
     @BeforeEach
     void setUp() {
-        request = CustomerRegistrationRequest.builder().email("adewehabang@gmail.com").password("pa55w0rd").country("Korean").build();
+        request = CustomerRegistrationRequest.builder().email("adewehabang@mail.com").password("pa55w0rd").country("Korean").build();
     }
 
     @Test

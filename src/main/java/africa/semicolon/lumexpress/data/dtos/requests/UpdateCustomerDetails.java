@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 
-public class UpdateCustomerDetail {
+public class UpdateCustomerDetails {
     private Long customerId;
     private String firstName;
     private String lastName;

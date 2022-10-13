@@ -1,13 +1,11 @@
 package africa.semicolon.lumexpress.services;
 
 import africa.semicolon.lumexpress.data.dtos.requests.CustomerRegistrationRequest;
-import africa.semicolon.lumexpress.data.dtos.requests.LoginRequest;
-import africa.semicolon.lumexpress.data.dtos.requests.UpdateCustomerDetail;
+import africa.semicolon.lumexpress.data.dtos.requests.UpdateCustomerDetails;
 import africa.semicolon.lumexpress.data.dtos.responses.CustomerRegistrationResponse;
-import africa.semicolon.lumexpress.data.dtos.responses.LoginResponse;
 
 public interface CustomerService {
     CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest);
 
-    String completeProfile(UpdateCustomerDetail updateCustomerDetail);
+    String updateProfile(UpdateCustomerDetails updateCustomerDetails);
 }

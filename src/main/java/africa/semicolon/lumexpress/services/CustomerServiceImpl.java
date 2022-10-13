@@ -2,15 +2,14 @@ package africa.semicolon.lumexpress.services;
 
 import africa.semicolon.lumexpress.data.dtos.requests.CustomerRegistrationRequest;
 import africa.semicolon.lumexpress.data.dtos.requests.EmailNotificationRequest;
-import africa.semicolon.lumexpress.data.dtos.requests.LoginRequest;
-import africa.semicolon.lumexpress.data.dtos.requests.UpdateCustomerDetail;
+import africa.semicolon.lumexpress.data.dtos.requests.UpdateCustomerDetails;
 import africa.semicolon.lumexpress.data.dtos.responses.CustomerRegistrationResponse;
-import africa.semicolon.lumexpress.data.dtos.responses.LoginResponse;
 import africa.semicolon.lumexpress.data.models.Address;
 import africa.semicolon.lumexpress.data.models.Cart;
 import africa.semicolon.lumexpress.data.models.Customer;
 import africa.semicolon.lumexpress.data.models.VerificationToken;
 import africa.semicolon.lumexpress.data.repositories.CustomerRepository;
+import africa.semicolon.lumexpress.exceptions.UserNotFoundException;
 import africa.semicolon.lumexpress.services.notification.EmailNotificationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +19,8 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,19 +41,20 @@ public class CustomerServiceImpl implements CustomerService{
 
         Customer savedCustomer = customerRepository.save(customer);
         log.info("customer to be saved in db:: {}", savedCustomer);
-
         var token= verificationTokenService.createToken(savedCustomer.getEmail());
 
-        emailNotificationService.sendHtmlMail(buildEmailNotificationRequest(token));
+        emailNotificationService.sendHtmlMail(buildEmailNotificationRequest(token, savedCustomer.getFirstName()));
 
         return registrationResponseBuilder(savedCustomer);
     }
 
-    private EmailNotificationRequest buildEmailNotificationRequest(VerificationToken verificationToken) {
-        var email= getEmailTemplate();
+    private EmailNotificationRequest buildEmailNotificationRequest(VerificationToken verificationToken, String customerName) {
+        var message= getEmailTemplate();
         String mail = null;
-        if(email != null){
-        mail = String.format(email, verificationToken.getUserEmail(), "http://localhost:8080/api/v1/customer/verify"+verificationToken.getToken());
+        if(message != null){
+            var verificationUrl = "http://localhost:8080/api/v1/customer/verify/"+verificationToken.getToken();
+        mail = String.format(message, customerName, verificationUrl);
+            log.info("mailed url->{}", verificationUrl);
         }
 
        return EmailNotificationRequest.builder()
@@ -79,7 +81,31 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public String completeProfile(UpdateCustomerDetail updateCustomerDetail) {
-        return null;
+    public String updateProfile(UpdateCustomerDetails updateCustomerDetails) {
+        Customer customerToUpdate = customerRepository.findById(updateCustomerDetails.getCustomerId()).orElseThrow(()-> new UserNotFoundException
+                (String.format("customer with id %d, noy found", updateCustomerDetails.getCustomerId())));
+        log.info("before update->{}", customerToUpdate);
+        mapper.map(updateCustomerDetails, customerToUpdate);
+
+        Set<Address> customerAddressList = customerToUpdate.getAddresses();
+        log.info("addresses{}", customerAddressList);
+
+        Optional<Address> foundAddress = customerAddressList.stream().findFirst();
+        if(foundAddress.isPresent()) applyAddressUpdate(foundAddress.get(), updateCustomerDetails);
+
+        customerToUpdate.getAddresses().add(foundAddress.get());
+        Customer updatedCustomer = customerRepository.save(customerToUpdate);
+        log.info("updated guy->{}", updatedCustomer);
+
+        return String.format("%s details updated successfully", updatedCustomer.getFirstName());
     }
+
+    private void applyAddressUpdate(Address address, UpdateCustomerDetails updateCustomerDetails) {
+        address.setCity(updateCustomerDetails.getCity());
+        address.setBuildingNumber(updateCustomerDetails.getBuildingNumber());
+        address.setState(updateCustomerDetails.getState());
+        address.setStreet(updateCustomerDetails.getStreet());
+
+    }
+
 }

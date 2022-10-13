@@ -22,6 +22,6 @@ public class VerificationToken {
     private Long id;
     private String token;
     private String userEmail;
-    private LocalDateTime createdAt;
-    private LocalDateTime expiresAt;
+    private LocalDateTime createdAt=LocalDateTime.now();
+    private LocalDateTime expiresAt= createdAt.plusMinutes(5);
 }
