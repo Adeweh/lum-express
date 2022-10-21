@@ -14,11 +14,13 @@ import africa.semicolon.lumexpress.services.notification.EmailNotificationServic
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,11 +35,16 @@ public class CustomerServiceImpl implements CustomerService{
     private final  VerificationTokenService verificationTokenService;
     private final ModelMapper mapper=new ModelMapper();
     private final EmailNotificationService emailNotificationService;
+
+    private final PasswordEncoder passwordEncoder;
     @Override
     public CustomerRegistrationResponse register(CustomerRegistrationRequest registerRequest) {
         Customer customer = mapper.map(registerRequest, Customer.class);
         customer.setCart(new Cart());
         setCustomerAddress(registerRequest, customer);
+        setCustomerAddress(registerRequest, customer);
+        String encodedPassword = passwordEncoder.encode(customer.getPassword());
+        customer.setPassword(encodedPassword);
 
         Customer savedCustomer = customerRepository.save(customer);
         log.info("customer to be saved in db:: {}", savedCustomer);
@@ -98,6 +105,11 @@ public class CustomerServiceImpl implements CustomerService{
         log.info("updated guy->{}", updatedCustomer);
 
         return String.format("%s details updated successfully", updatedCustomer.getFirstName());
+    }
+
+    @Override
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
     }
 
     private void applyAddressUpdate(Address address, UpdateCustomerDetails updateCustomerDetails) {

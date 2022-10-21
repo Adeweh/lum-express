@@ -9,6 +9,7 @@ import africa.semicolon.lumexpress.data.models.Vendor;
 import africa.semicolon.lumexpress.data.repositories.AdminRepository;
 import africa.semicolon.lumexpress.data.repositories.CustomerRepository;
 import africa.semicolon.lumexpress.data.repositories.VendorRepository;
+import africa.semicolon.lumexpress.exceptions.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +39,22 @@ public class UserServiceImpl implements UserService{
 
     private LoginResponse buildLoginResponse(LumExpressUser lumExpressUser) {
         return LoginResponse.builder().message("user logged in successfully").code(200).build();
+    }
+
+    @Override
+    public  LumExpressUser getUserByUsername(String email){
+        Optional<Admin> foundAdmin = adminRepository.findByEmail(email);
+        if(foundAdmin.isPresent()) return  foundAdmin.get();
+
+        Optional<Customer> foundCustomer = customerRepository.findByEmail(email);
+        if(foundCustomer.isPresent()) return  foundCustomer.get();
+
+        Optional<Vendor> foundVendor = vendorRepository.findByEmail(email);
+        if(foundVendor.isPresent()) return  foundVendor.get();
+
+        throw  new UserNotFoundException("User not found guy!!");
+
+
+
     }
 }
